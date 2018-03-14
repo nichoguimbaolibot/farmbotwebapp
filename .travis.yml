@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+- 8.9.4
+before_script:
+- sudo apt-get install curl -y
+- mv node_modules/.bin/which node_modules/.bin/which.backup
+- rvm install 2.4.2 && rvm use 2.4.2
+- mv node_modules/.bin/which.backup node_modules/.bin/which
+- cp config/database.travis.yml config/database.yml
+- mkdir -p public/app
+- touch public/app/index.html
+- bundle install
+- bundle exec rake db:create db:migrate
+- yarn install
+script:
+- export SECRET_TOKEN=e815982094c62436066bafc9151f2d33c4a351a776654cb7487476de260a4592
+- export MQTT_HOST=example.com
+- export OS_UPDATE_SERVER=http://example.com
+- export FW_UPDATE_SERVER=http://example.com
+- export DB=postgresql
+- export COVERALLS_REPO_TOKEN=lEX6nkql7y2YFCcIXVq5ORvdvMtYzfZdG
+- bundle exec rspec --fail-fast=3
+- npm run typecheck
+- npm run test-slow
+- npm run coverage
